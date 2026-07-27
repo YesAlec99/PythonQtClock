@@ -22,15 +22,16 @@ class Ui_MainWindow(object):
         self.AppView.setObjectName("AppView")
         self.SettingTimer = QtWidgets.QWidget()
         self.SettingTimer.setObjectName("SettingTimer")
-        self.pushButton = QtWidgets.QPushButton(self.SettingTimer)
-        self.pushButton.setGeometry(QtCore.QRect(330, 430, 93, 28))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(self.SettingTimer)
-        self.pushButton_2.setGeometry(QtCore.QRect(560, 430, 93, 28))
-        self.pushButton_2.setObjectName("pushButton_2")
+        self.StartTimer = QtWidgets.QPushButton(self.SettingTimer)
+        self.StartTimer.setGeometry(QtCore.QRect(330, 430, 93, 28))
+        self.StartTimer.setObjectName("StartTimer")
+        self.ResetTimer = QtWidgets.QPushButton(self.SettingTimer)
+        self.ResetTimer.setGeometry(QtCore.QRect(560, 430, 93, 28))
+        self.button__ = "pushButton_2"
+        self.ResetTimer.setObjectName("%s" % self.button__)
         self.graphicsView = QtWidgets.QGraphicsView(self.SettingTimer)
         self.graphicsView.setGeometry(QtCore.QRect(-5, 1, 811, 591))
-        self.graphicsView.setObjectName("graphicsView")
+        self.graphicsView.setObjectName("ResetTimer")
         self.timeEdit = QtWidgets.QTimeEdit(self.SettingTimer)
         self.timeEdit.setGeometry(QtCore.QRect(130, 160, 511, 221))
         font = QtGui.QFont()
@@ -38,9 +39,9 @@ class Ui_MainWindow(object):
         self.timeEdit.setFont(font)
         self.timeEdit.setMaximumTime(QtCore.QTime(10, 0, 0))
         self.timeEdit.setObjectName("timeEdit")
-        self.graphicsView.raise_()
-        self.pushButton.raise_()
-        self.pushButton_2.raise_()
+        # self.graphicsView.raise_()
+        self.StartTimer.raise_()
+        self.ResetTimer.raise_()
         self.timeEdit.raise_()
         self.AppView.addTab(self.SettingTimer, "")
         self.tab = QtWidgets.QWidget()
@@ -86,14 +87,14 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.AppView.setCurrentIndex(1)
+        self.AppView.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
-        self.pushButton_2.setText(_translate("MainWindow", "PushButton"))
+        self.StartTimer.setText(_translate("MainWindow", "Start Timer"))
+        self.ResetTimer.setText(_translate("MainWindow", "Reset Timer"))
         self.AppView.setTabText(self.AppView.indexOf(self.SettingTimer), _translate("MainWindow", "Tab 1"))
         self.AppView.setTabText(self.AppView.indexOf(self.tab), _translate("MainWindow", "Page"))
         self.pushButton_3.setText(_translate("MainWindow", "PushButton"))
@@ -103,8 +104,11 @@ class Ui_MainWindow(object):
         self.AppView.setTabText(self.AppView.indexOf(self.TimerView), _translate("MainWindow", "Tab 2"))
 
 
+
+
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
