@@ -1,0 +1,175 @@
+# Global variables
+timer_id = None
+remaining_time = 0
+current_session = None
+
+# List to store stats
+stats = []
+
+
+# Function to start the countdown
+def start_countdown():
+    global remaining_time, current_session, timer_id
+
+    # Prevent starting a new timer while one is already running
+    if timer_id is not None:
+        return
+
+    total_seconds = (
+        int(hour_var.get()) * 3600
+        + int(minute_var.get()) * 60
+        + int(second_var.get())
+    )
+
+    if total_seconds == 0:
+        return
+
+    remaining_time = total_seconds
+
+    current_session = {
+        "start_time": f"{hour_var.get()}:{minute_var.get()}:{second_var.get()}",
+        "original_time": total_seconds,
+        "status": "running",
+        "run_time": 0
+    }
+
+    stats.append(current_session)
+
+    countdown(remaining_time)
+
+
+# Countdown function
+def countdown(count):
+    global timer_id, remaining_time
+
+    remaining_time = count
+
+    if count >= 0:
+        hours = count // 3600
+        minutes = (count % 3600) // 60
+        seconds = count % 60
+
+        time_label.config(
+            text=f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        )
+
+        timer_id = root.after(1000, countdown, count - 1)
+
+    else:
+        time_label.config(text="Time's up!")
+        timer_id = None
+
+        if current_session:
+            current_session["status"] = "finished"
+            current_session["run_time"] = current_session["original_time"]
+
+
+# Pause timer
+def stop_countdown():
+    global timer_id
+
+    if timer_id is not None:
+        root.after_cancel(timer_id)
+        timer_id = None
+
+        if current_session:
+            current_session["status"] = "paused"
+
+
+# Continue timer
+def continue_countdown():
+    global timer_id
+
+    if timer_id is None and remaining_time > 0:
+        if current_session:
+            current_session["status"] = "running"
+
+        countdown(remaining_time)
+
+
+# Cancel timer
+def cancel_countdown():
+    global timer_id
+
+    if current_session is None:
+        return
+
+    if timer_id is not None:
+        root.after_cancel(timer_id)
+
+    timer_id = None
+
+    elapsed = current_session["original_time"] - remaining_time
+
+    current_session["status"] = "cancelled"
+    current_session["run_time"] = elapsed
+
+    time_label.config(text="00:00:00")
+
+
+# Reset timer
+def reset_countdown():
+    global timer_id, remaining_time
+
+    if current_session:
+
+        if timer_id is not None:
+            root.after_cancel(timer_id)
+
+        elapsed = (
+            current_session["original_time"]
+            - remaining_time
+        )
+
+        current_session["status"] = "cancelled"
+        current_session["run_time"] = elapsed
+
+    timer_id = None
+    remaining_time = 0
+
+    time_label.config(text="00:00:00")
+
+    hour_var.set("00")
+    minute_var.set("00")
+    second_var.set("00")
+
+
+# Show statistics window
+def show_stats():
+    stats_window = tk.Toplevel(root)
+    stats_window.title("Timer Stats")
+    stats_window.geometry("500x300")
+
+    tree = ttk.Treeview(
+        stats_window,
+        columns=("Start Time", "Status", "Run Time"),
+        show="headings"
+    )
+
+    tree.heading("Start Time", text="Start Time")
+    tree.heading("Status", text="Status")
+    tree.heading("Run Time", text="Run Time")
+
+    tree.column("Start Time", width=150)
+    tree.column("Status", width=100)
+    tree.column("Run Time", width=150)
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
+    for stat in stats:
+
+        run_time = stat.get("run_time", 0)
+
+        hrs = run_time // 3600
+        mins = (run_time % 3600) // 60
+        secs = run_time % 60
+
+        tree.insert(
+            "",
+            tk.END,
+            values=(
+                stat["start_time"],
+                stat["status"],
+                f"{hrs:02d}:{mins:02d}:{secs:02d}"
+            )
+        )
