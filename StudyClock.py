@@ -7,6 +7,7 @@ from PyQt5.QtCore import QPauseAnimation
 
 from generatedUI import Ui_MainWindow
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -15,18 +16,69 @@ class MainWindow(QtWidgets.QMainWindow):
         # State variables
         self.remaining_time = 0
         self.timer = None
+        self.starting_time = QtCore.QTime(0, 0, 0)
+        self.logic_button=False
         # Connect buttons
         self.ui.StartTimer.clicked.connect(self.start_timer)
         self.ui.ResetTimer.clicked.connect(self.reset_timer)
         self.ui.PauseTimer.clicked.connect(self.pause_timer)
         self.ui.ContinueTimer.clicked.connect(self.continue_timer)
+        self.ui.ResetTimer.clicked.connect(self.reset_timer)
+        self.ui.ResetTimer_2.clicked.connect(self.reset_timer_2)
+        self.ui.CancelTimer.clicked.connect(self.cancel_timer)
         self.ui.timeEdit.setDisplayFormat("hh:mm:ss")
         self.ui.timeEdit_2.setDisplayFormat("hh:mm:ss")
+
+    def cancel_timer(self):
+        self.timer.stop()
+        self.ui.AppView.setCurrentWidget(self.ui.SettingTimer)
+        self.ui.timeEdit.setTime(self.starting_time)
+
+    def reset_timer(self):
+        self.ui.timeEdit.setTime(QtCore.QTime(0, 0, 0))
+
+    def reset_timer_2(self):
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Confirm Action",
+            "Do you want to reset the timer?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No
+        )
+
+        if reply == QtWidgets.QMessageBox.Yes:
+            if self.starting_time is not None:
+                self.ui.timeEdit_2.setTime(self.starting_time)
+                self.pause_timer()
+                self.ui.PauseTimer.setEnabled(False)
+                self.ui.ContinueTimer.setEnabled(True)
+            self.remaining_time = (
+                    self.starting_time.hour() * 3600 +
+                    self.starting_time.minute() * 60 +
+                    self.starting_time.second())
+            if self.timer is not None:
+                self.timer.stop()
+
+
+        else:
+            QtWidgets.QMessageBox.information(self, "Info", "Timer not reset!")
+
     def continue_timer(self):
-        skip()
+        if self.timer is not None and not self.timer.isActive():
+            self.timer.start(1000)
+        self.enabled = self.ui.PauseTimer.setEnabled(True)
+        self.ui.ContinueTimer.setEnabled(False)
+        QtWidgets.QMessageBox.information(self, "Info", "Timer continued!")
+
+
 
     def start_timer(self):
+
+        self.starting_time = self.ui.timeEdit.time()
+
+        self.ui.PauseTimer.setEnabled(True)
         self.ui.ContinueTimer.setEnabled(False)
+
         self.ui.AppView.setCurrentWidget(self.ui.TimerView)
 
         # Prevent multiple timers
@@ -39,11 +91,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if total_seconds == 0:
             return
 
-
         self.ui.timeEdit_2.setTime(self.ui.timeEdit.time())
 
         self.remaining_time = total_seconds
-
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update_timer)
@@ -61,12 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.timer = None
             QtWidgets.QMessageBox.information(self, "Info", "Time's up!")
 
-    def reset_timer(self):
-        if self.timer is not None:
-            self.timer.stop()
-            self.timer = None
-        self.remaining_time = 0
-        QtWidgets.QMessageBox.information(self, "Info", "Reset Timer clicked!")
+    
     def pause_timer(self):
         if self.timer is not None:
             self.timer.stop()
@@ -75,10 +120,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.ContinueTimer.setEnabled(True)
 
 
-
-
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+
+
