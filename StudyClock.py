@@ -111,7 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.timer = None
             QtWidgets.QMessageBox.information(self, "Info", "Time's up!")
 
-    
+
     def pause_timer(self):
         if self.timer is not None:
             self.timer.stop()
